@@ -1,0 +1,99 @@
+plugins{
+    id "org.springframework.boot" version "2.3.5.RELEASE"
+    id "java"
+    id "maven-publish"
+}
+project.ext.SpringBootVer = "2.3.5.RELEASE"
+group 'com.alanpoi.im'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    maven{ url "http://maven.pengzhuoxun.com:8081/nexus/content/groups/public/"}
+    maven{ url "https://maven.aliyun.com/nexus/content/groups/public/"}
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.apache.dubbo:dubbo-spring-boot-starter:2.7.8")
+    compile("com.ctrip.framework.apollo:apollo-client:1.7.0")
+    compile(
+            [group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: SpringBootVer],
+            [group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: SpringBootVer],
+            [group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: SpringBootVer],
+            [group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: SpringBootVer],
+    )
+    compile("io.micrometer:micrometer-registry-prometheus:1.1.0")
+    compile("org.apache.commons:commons-lang3:3.1")
+    compile("io.netty:netty-all:5.0.0.Alpha1")
+    compile("com.alibaba:fastjson:1.2.9")
+    compile("com.google.protobuf:protobuf-java:3.6.0")
+    compile("com.googlecode.protobuf-java-format:protobuf-java-format:1.4")
+    compile("org.asynchttpclient:async-http-client:2.5.2")
+    compile("redis.clients:jedis:3.3.0")
+    compile("org.apache.dubbo:dubbo:2.7.8")
+
+    compile("org.apache.zookeeper:zookeeper:3.4.6") {
+        exclude(module: 'slf4j-log4j12')
+    }
+    compile("org.apache.curator:curator-recipes:4.0.0"){
+        exclude(group: 'org.apache.zookeeper')
+    }
+    compile ("com.github.sgroschupf:zkclient:0.1"){
+        exclude(module: 'slf4j-log4j12')
+    }
+    compile ("org.apache.httpcomponents:httpclient:4.5.2")
+    compile ("org.aspectj:aspectjrt:1.9.2")
+    compile ("org.aspectj:aspectjweaver:1.9.2")
+    compile group: 'com.qzd.im', name: 'qzd-im-common-lib', version: '0.2.4-SNAPSHOT'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: SpringBootVer
+}
+
+
+
+task copyTool(type: Copy){
+    delete 'build/tmp_tool/client/src/com/wz/qzdim/transtools'
+    from 'src/main/java/com/wz/qzdim/transtools'
+    into 'build/tmp_tool/client/src/com/wz/transtools'
+}
+
+task compileTool(type: JavaCompile, dependsOn: copyTool){
+    delete 'build/tmp_tool/client/classes/*'
+    source 'build/tmp_tool/client/src'
+    destinationDir file('build/tmp_tool/client/classes')
+}
+
+compileTool{
+    classpath = sourceSets.main.compileClasspath
+}
+
+task jarTools(type: Jar, dependsOn: compileTool){
+    delete 'build/libs/im-trans-tools.jar'
+    baseName 'im-trans-tools'
+    from compileTool.destinationDir
+}
+
+
+publishing {
+    repositories {
+        maven {
+            url "http://maven.pengzhuoxun.com:8081/nexus/content/repositories/snapshots/"
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+        }
+    }
+    publications {
+        trans_tools(MavenPublication) {
+            groupId = 'com.alanpoi.im'
+            artifactId = 'im-trans-tools'
+            version = '0.0.1-SNAPSHOT'
+
+            //from components.java
+
+            artifact jarTools
+        }
+    }
+}
