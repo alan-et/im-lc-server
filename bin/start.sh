@@ -19,8 +19,8 @@ JAVA=java
 
 jars="${WS_DIR}/build/libs/${APP_NAME}-0.0.1-SNAPSHOT.jar"
 
-JAVA_OPTS=" -Ddubbo.properties.file=${DUBBO_PROPERTIES}"
-JAVA_OPTS="$JAVA_OPTS -Dcsp.sentinel.log.dir=${WS_DIR}/logs/"
+#JAVA_OPTS=" -Ddubbo.properties.file=${DUBBO_PROPERTIES}"
+#JAVA_OPTS="$JAVA_OPTS -Dcsp.sentinel.log.dir=${WS_DIR}/logs/"
 JAVA_OPTS="$JAVA_OPTS -Dproject.name=${APP_NAME}"
 JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOGS_DIR}"
 JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails -Xloggc:${LOGS_DIR}/gc.log"

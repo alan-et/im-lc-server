@@ -23,7 +23,7 @@ dependencies {
             [group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: SpringBootVer],
             [group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: SpringBootVer],
     )
-    compile("io.micrometer:micrometer-registry-prometheus:1.1.0")
+    compile("io.micrometer:micrometer-registry-prometheus:1.5.1")
     compile("org.apache.commons:commons-lang3:3.1")
     compile("io.netty:netty-all:5.0.0.Alpha1")
     compile("com.alibaba:fastjson:1.2.9")
