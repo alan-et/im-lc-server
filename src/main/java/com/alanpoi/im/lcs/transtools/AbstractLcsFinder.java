@@ -153,7 +153,7 @@ public abstract class AbstractLcsFinder implements LcsFinder{
     private class LcsClientHandler extends SimpleChannelInboundHandler<Frame> {
 
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
             if(Frame.CMD_HEARTBEAT_RES == msg.getCmd()){
                 log.info("recv heartbeat:[{}]", ctx.channel().toString());
             }

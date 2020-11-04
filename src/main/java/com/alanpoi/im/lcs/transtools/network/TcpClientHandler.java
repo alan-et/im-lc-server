@@ -14,7 +14,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class TcpClientHandler extends SimpleChannelInboundHandler<Frame> {
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
         TcpClient client = ctx.channel().attr(TcpClient.CLIENT).get();
         if(null == client){
             ctx.fireChannelRead(msg);

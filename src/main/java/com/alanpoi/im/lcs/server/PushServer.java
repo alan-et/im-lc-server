@@ -64,7 +64,7 @@ public class PushServer {
     @ChannelHandler.Sharable
     private class FrameHandler extends SimpleChannelInboundHandler<Frame>{
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
             Channel chnl = ctx.channel();
             InetSocketAddress addr = (InetSocketAddress)chnl.remoteAddress();
             if(Frame.CMD_HEARTBEAT == msg.getCmd()){

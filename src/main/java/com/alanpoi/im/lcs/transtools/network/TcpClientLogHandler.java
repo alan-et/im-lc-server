@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class TcpClientLogHandler  extends SimpleChannelInboundHandler<Frame> {
     private static Logger log = LoggerFactory.getLogger(TcpClientLogHandler.class);
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
         if(Frame.CMD_HEARTBEAT_RES == msg.getCmd()){
             log.info("recv heart res {}", ctx.channel());
         }

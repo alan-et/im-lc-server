@@ -26,7 +26,7 @@ public class TestServer {
     @ChannelHandler.Sharable
     private static class ServerHandler extends SimpleChannelInboundHandler<Frame> {
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
             Channel channel = ctx.channel();
             InetSocketAddress addr = (InetSocketAddress) channel.remoteAddress();
 

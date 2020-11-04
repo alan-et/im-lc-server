@@ -170,7 +170,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
      * @throws Exception
      */
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel chnl = ctx.channel();
         SecpChannel secpChnl = chnl.attr(SecpChannelAttrs.SECPCHANNEL).get();
 
@@ -247,19 +247,19 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
      * @param msg
      */
     private void doHandlerHttpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) {
-        if(msg.getUri().startsWith("/health")){
+        if(msg.uri().startsWith("/health")){
             sendHttpResponse(ctx, msg, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer("ok".getBytes())));
             return;
         }
         //SignalHttpApi signalHttpApi=new SignalHttpApi();
        // FullHttpResponse response = signalHttpApi.recv(msg);
         // http 解码失败
-        if(!msg.getDecoderResult().isSuccess() || (!"websocket".equals(msg.headers().get("Upgrade")))){
+        if(!msg.decoderResult().isSuccess() || (!"websocket".equals(msg.headers().get("Upgrade")))){
             sendHttpResponse(ctx, msg,new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.BAD_REQUEST));
             return;
         }
         //可以获取msg的uri来判断
-        String uri = msg.getUri();
+        String uri = msg.uri();
         if(!uri.substring(1).equals(URI)){
             ctx.close();
         }
@@ -270,7 +270,8 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
         );
         handshaker = factory.newHandshaker(msg);
         if(handshaker == null){
-            WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
+//            WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
         }
         //进行连接
         handshaker.handshake(ctx.channel(), (FullHttpRequest) msg);
@@ -289,8 +290,8 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, DefaultFullHttpResponse res) {
         // 返回应答给客户端
-        if (res.getStatus().code() != 200) {
-            ByteBuf buf = Unpooled.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8);
+        if (res.status().code() != 200) {
+            ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();
         }
@@ -301,7 +302,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
         }
         res.headers().add(HttpHeaderNames.CONTENT_LENGTH, contentLength);
         ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!HttpHeaders.isKeepAlive(req) || res.getStatus().code() != 200) {
+        if (!HttpUtil.isKeepAlive(req) || res.status().code() != 200) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }

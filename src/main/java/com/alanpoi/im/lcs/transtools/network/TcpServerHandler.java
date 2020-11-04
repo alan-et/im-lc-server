@@ -17,7 +17,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<Frame> {
     private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
         //log.debug("recv frame msg. cmd:{}", msg.getCmd());
         if(Frame.CMD_HEARTBEAT == msg.getCmd()){
             Frame res = msg.clone();

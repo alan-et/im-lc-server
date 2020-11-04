@@ -54,7 +54,7 @@ public class TestClient {
     private static class ClientHandler extends SimpleChannelInboundHandler<Frame> {
 
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, Frame msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
 
             if(Frame.CMD_HEARTBEAT_RES == msg.getCmd()){
                 log.info("recv heart res");

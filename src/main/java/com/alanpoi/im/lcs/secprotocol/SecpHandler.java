@@ -87,7 +87,7 @@ public class SecpHandler extends SimpleChannelInboundHandler<SecpMessage> {
 
 
 	@Override
-	protected void messageReceived(ChannelHandlerContext ctx, SecpMessage msg) throws Exception{
+	protected void channelRead0(ChannelHandlerContext ctx, SecpMessage msg) throws Exception{
 		Channel chnl = ctx.channel();
 		DefaultSecpChannel secpChnl = (DefaultSecpChannel)chnl.attr(SecpChannelAttrs.SECPCHANNEL).get();
 		log.info("recv msg lcId:{} channelId:{} cmd:{}", msg.getLcId(), secpChnl.getId(), msg.getCmd());
