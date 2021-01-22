@@ -266,7 +266,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
         ctx.attr(AttributeKey.valueOf("type")).set(uri);
         //可以通过url获取其他参数
         WebSocketServerHandshakerFactory factory = new WebSocketServerHandshakerFactory(
-                "ws://"+msg.headers().get("Host")+"/"+URI+"",null,false
+                "ws://"+msg.headers().get("Host")+"/"+URI+"",null,true
         );
         handshaker = factory.newHandshaker(msg);
         if(handshaker == null){
