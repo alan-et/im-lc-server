@@ -25,7 +25,7 @@ JAVA_OPTS="$JAVA_OPTS -Dproject.name=${APP_NAME}"
 JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOGS_DIR}"
 JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails -Xloggc:${LOGS_DIR}/gc.log"
 
-nohup $JAVA -jar $JAVA_OPTS $jars >> ${STD_LOG_FILE} 2>&1 &
+nohup $JAVA -jar $JAVA_OPTS $jars >> /dev/null 2>&1 &
 pid=$!
 
 echo $pid > ${PID_FILE}
