@@ -31,7 +31,7 @@ public abstract class AbstractLcsRegistry implements LcsRegistry {
         isStart = true;
 
         lcs = new LcsInfo();
-        lcs.setIp(local.getHostName());
+        lcs.setIp(local.getAddress().getHostAddress());
         lcs.setPort(local.getPort());
         lcs.setHbtime(System.currentTimeMillis());
         lcs.setStarttime(System.currentTimeMillis());
