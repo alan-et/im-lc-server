@@ -54,8 +54,8 @@ public class SendMsgListener {
             errMsg = e.getMessage();
         }
 //        catch (BlockException e){
-            code = CommonError.ERROR_REQUEST_FREQUENTLY.getCode();
-            errMsg = CommonError.ERROR_REQUEST_FREQUENTLY.getMsg();
+//            code = CommonError.ERROR_REQUEST_FREQUENTLY.getCode();
+//            errMsg = CommonError.ERROR_REQUEST_FREQUENTLY.getMsg();
 //        }
         ResponseUtil.respond(event.getSecpMessage(), userChannel, SignalProto.Cmd.SEND_MSG_RES_VALUE, code, errMsg, res);
     }
