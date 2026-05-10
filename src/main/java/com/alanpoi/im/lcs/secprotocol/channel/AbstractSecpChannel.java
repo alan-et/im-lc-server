@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * 安全Channel抽象实现

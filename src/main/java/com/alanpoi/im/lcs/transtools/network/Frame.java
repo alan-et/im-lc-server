@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @created 2019-07-18
  *
  * 消息类型

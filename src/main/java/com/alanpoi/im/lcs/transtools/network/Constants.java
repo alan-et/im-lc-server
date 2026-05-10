@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.transtools.network;
 
 /***
- * @author brandon
+ * @author pengzhuoxun
  * @created 2019-07-18
  */
 public class Constants {

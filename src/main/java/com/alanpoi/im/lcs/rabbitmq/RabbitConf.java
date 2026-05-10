@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 @Configuration
 public class RabbitConf {
-    @Value("${qzdim.rabbitmq.vhost:}")
+    @Value("${qzdim.rabbitmq.virtual-host:}")
     private String vhost;
 
     @Value("${qzdim.rabbitmq.host:}")
@@ -24,7 +24,7 @@ public class RabbitConf {
     @Value("${qzdim.rabbitmq.port:}")
     private int port;
 
-    @Value("${qzdim.rabbitmq.user:}")
+    @Value("${qzdim.rabbitmq.username:}")
     private String user;
 
     @Value("${qzdim.rabbitmq.password:}")

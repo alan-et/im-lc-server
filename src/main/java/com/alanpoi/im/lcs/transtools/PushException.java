@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.transtools;
 
 /***
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-19
  *
  * 推送异常类型

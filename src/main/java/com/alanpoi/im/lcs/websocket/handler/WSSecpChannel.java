@@ -4,7 +4,7 @@ import com.alanpoi.im.lcs.secprotocol.channel.AbstractSecpChannel;
 import io.netty.channel.Channel;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * 把websocket channel封装成安全Channel

@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * LCS服务推送类

@@ -6,7 +6,7 @@ import io.netty.util.concurrent.Promise;
 import java.util.List;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * LCS push请求类型

@@ -10,9 +10,7 @@ public class DefaultThreadFactory implements ThreadFactory {
     private final String namePrefix;
 
     DefaultThreadFactory(String poolName) {
-        SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() :
-                Thread.currentThread().getThreadGroup();
+        group =  Thread.currentThread().getThreadGroup();;
         namePrefix = poolName+"-" +
                 poolNumber.getAndIncrement() +
                 "-thread-";

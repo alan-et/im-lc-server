@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * Tcp Client连接器

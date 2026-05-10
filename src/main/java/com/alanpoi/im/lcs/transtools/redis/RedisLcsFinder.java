@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * LCS服务finder类型的redis实现

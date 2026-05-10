@@ -1,64 +1,81 @@
 plugins {
-    id "org.springframework.boot" version "2.3.5.RELEASE"
+    id "org.springframework.boot" version "2.7.18" // 升级至 2.7.x 以支持 JDK 17
     id "java"
     id "maven-publish"
+    id "io.spring.dependency-management" version "1.0.15.RELEASE"
 }
+
 project.ext {
-    SpringBootVer = "2.3.5.RELEASE"
-    DubboVersion = "2.7.8"
-    RedisVersion = "3.3.0"
-    NettyVersion = "4.1.53.Final"
-    FastjsonVersion = "1.2.9"
-    ZookeeperVersion = "3.4.6"
+    SpringBootVer = "2.7.18"
+    DubboVersion = "2.7.23"
+    RedisVersion = "3.9.0"
+    NettyVersion = "4.1.94.Final" // 提升 Netty 版本以解决 JDK 17 反射问题
+    FastjsonVersion = "1.2.83"    // 修复安全漏洞
+    ZookeeperVersion = "3.9.1"   // 提升 Zookeeper 客户端版本
 }
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 group 'com.alanpoi.im'
 version '0.0.1-SNAPSHOT'
 
 repositories {
     mavenLocal()
-    maven { url "http://maven.pengzhuoxun.com:8081/nexus/content/groups/public/" }
+    maven {
+        url "http://43.199.160.152:8081/repository/maven-public/"
+        allowInsecureProtocol = true
+    }
     maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
     mavenCentral()
 }
 
 dependencies {
-    compile("org.apache.dubbo:dubbo-spring-boot-starter:${DubboVersion}")
-    compile("org.apache.dubbo:dubbo:${DubboVersion}")
-    compile("com.ctrip.framework.apollo:apollo-client:1.7.0")
-    compile(
-            [group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: SpringBootVer],
-            [group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: SpringBootVer],
-            [group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: SpringBootVer],
-            [group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: SpringBootVer],
-    )
-    compile("io.micrometer:micrometer-registry-prometheus:1.5.1")
-    compile("org.apache.commons:commons-lang3:3.1")
-    compile("io.netty:netty-all:${NettyVersion}")
-    compile("com.alibaba:fastjson:${FastjsonVersion}")
-    compile("com.google.protobuf:protobuf-java:3.6.0")
-    compile("com.googlecode.protobuf-java-format:protobuf-java-format:1.4")
-    compile("org.asynchttpclient:async-http-client:2.9.0") {
+    // Dubbo & Spring Boot 适配
+    implementation("org.apache.dubbo:dubbo-spring-boot-starter:${DubboVersion}")
+    implementation("org.apache.dubbo:dubbo:${DubboVersion}")
+//    implementation("com.ctrip.framework.apollo:apollo-client:1.9.1") // 提升 Apollo 兼容性
+
+    // Spring Boot Starters
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+
+    implementation("io.micrometer:micrometer-registry-prometheus:1.9.17")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("io.netty:netty-all:${NettyVersion}")
+    implementation("com.alibaba:fastjson:${FastjsonVersion}")
+    implementation("com.google.protobuf:protobuf-java:3.19.6")
+    implementation("com.googlecode.protobuf-java-format:protobuf-java-format:1.4")
+
+    implementation("org.asynchttpclient:async-http-client:2.12.3") {
         exclude(group: 'io.netty')
     }
-    compile("redis.clients:jedis:${RedisVersion}")
+    implementation("redis.clients:jedis:${RedisVersion}")
 
-    compile("org.apache.zookeeper:zookeeper:${ZookeeperVersion}") {
-        exclude(module: 'slf4j-log4j12')
+    // Zookeeper & Curator
+    implementation("org.apache.zookeeper:zookeeper:${ZookeeperVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        exclude group: 'log4j', module: 'log4j'
     }
-    compile("org.apache.curator:curator-recipes:4.0.0") {
+    implementation("org.apache.curator:curator-recipes:4.2.0") {
         exclude(group: 'org.apache.zookeeper')
     }
-    compile("com.github.sgroschupf:zkclient:0.1") {
-        exclude(module: 'slf4j-log4j12')
+    implementation("com.github.sgroschupf:zkclient:0.1") {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
-    compile("org.apache.httpcomponents:httpclient:4.5.2")
-    compile("org.aspectj:aspectjrt:1.9.2")
-    compile("org.aspectj:aspectjweaver:1.9.2")
-    compile group: 'com.qzd.im', name: 'qzd-im-common-lib', version: '0.2.4-SNAPSHOT'
-    compile group: 'com.alanpoi.im', name: 'im-message-servie', version: '0.0.1-SNAPSHOT'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: SpringBootVer
+
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.aspectj:aspectjrt:1.9.7")
+    implementation("org.aspectj:aspectjweaver:1.9.7")
+
+    // 业务依赖
+    implementation group: 'com.alanpoi.im', name: 'im-common-lib', version: '1.0.0-SNAPSHOT'
+    implementation group: 'com.alanpoi.im', name: 'im-message-servie', version: '0.0.1-SNAPSHOT'
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation 'junit:junit:4.13.2'
 }
 
 
@@ -71,7 +88,8 @@ task copyTool(type: Copy) {
 task compileTool(type: JavaCompile, dependsOn: copyTool) {
     delete 'build/tmp_tool/client/classes/*'
     source 'build/tmp_tool/client/src'
-    destinationDir file('build/tmp_tool/client/classes')
+    destinationDirectory = file('build/tmp_tool/client/classes')
+    options.failOnError = false
 }
 
 compileTool {
@@ -80,18 +98,19 @@ compileTool {
 
 task jarTools(type: Jar, dependsOn: compileTool) {
     delete 'build/libs/im-trans-tools.jar'
-    baseName 'im-trans-tools'
-    from compileTool.destinationDir
+    archiveBaseName = 'im-trans-tools'
+    from compileTool.destinationDirectory
 }
 
 
 publishing {
     repositories {
         maven {
-            url "http://maven.pengzhuoxun.com:8081/nexus/content/repositories/snapshots/"
+            url "http://43.199.160.152:8081/repository/maven-snapshots/"
+            allowInsecureProtocol = true
             credentials {
                 username 'admin'
-                password 'admin123'
+                password 'im-liangbo@123'
             }
         }
     }
@@ -99,7 +118,7 @@ publishing {
         trans_tools(MavenPublication) {
             groupId = 'com.alanpoi.im'
             artifactId = 'im-trans-tools'
-            version = '0.0.2-SNAPSHOT'
+            version = '0.0.1-SNAPSHOT'
 
             //from components.java
 

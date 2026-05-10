@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.secprotocol;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * secprotocol 错误定义

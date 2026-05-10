@@ -3,7 +3,7 @@ package com.alanpoi.im.lcs.secprotocol.channel;
 import io.netty.util.AttributeKey;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * 安全Channel属性定义

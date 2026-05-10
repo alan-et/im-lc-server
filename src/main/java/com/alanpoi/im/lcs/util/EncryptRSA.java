@@ -9,9 +9,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -104,5 +102,50 @@ public class EncryptRSA {
 		}  
 		
         return out;  
+	}
+
+	public static void main(String[] args) {
+		try {
+			// 1. 初始化密钥对生成器，指定算法为 RSA
+			KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+
+			// 2. 指定密钥长度为 2048 位
+			keyPairGen.initialize(2048);
+
+			// 3. 生成密钥对
+			KeyPair keyPair = keyPairGen.generateKeyPair();
+			PrivateKey privateKey = keyPair.getPrivate();
+			PublicKey publicKey = keyPair.getPublic();
+
+			// 4. 打印私钥 (PKCS#8 格式)
+			System.out.println("-----BEGIN PRIVATE KEY-----");
+			System.out.println(formatBase64(privateKey.getEncoded()));
+			System.out.println("-----END PRIVATE KEY-----");
+
+			System.out.println("\n");
+
+			// 5. 打印公钥 (X.509 格式)
+			System.out.println("-----BEGIN PUBLIC KEY-----");
+			System.out.println(formatBase64(publicKey.getEncoded()));
+			System.out.println("-----END PUBLIC KEY-----");
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 将字节数组转为 Base64 并按 64 字符换行（符合 PEM 规范）
+	 */
+	private static String formatBase64(byte[] data) {
+		String base64 = Base64.getEncoder().encodeToString(data);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < base64.length(); i++) {
+			sb.append(base64.charAt(i));
+			if ((i + 1) % 64 == 0) {
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
 	}
 }

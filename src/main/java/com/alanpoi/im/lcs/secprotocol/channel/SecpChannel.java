@@ -4,7 +4,7 @@ import com.alanpoi.im.lcs.secprotocol.SecpMessage;
 import io.netty.channel.Channel;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * 安全协议通道类型

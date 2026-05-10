@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * @author bradon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * Lcs注册中心Redis实现

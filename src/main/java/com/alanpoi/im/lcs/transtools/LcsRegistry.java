@@ -3,7 +3,7 @@ package com.alanpoi.im.lcs.transtools;
 import java.net.InetSocketAddress;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-07-18
  *
  * LCS服务注册中心接口

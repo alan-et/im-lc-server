@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.secprotocol.channel;
 
 /**
- * @author brandon
+ * @author pengzhuoxun
  * @create 2019-06-12
  *
  * 安全Channel状态定义

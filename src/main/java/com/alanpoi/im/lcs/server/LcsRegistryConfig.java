@@ -2,6 +2,8 @@ package com.alanpoi.im.lcs.server;
 
 import com.alanpoi.im.lcs.transtools.LcsRegistry;
 import com.alanpoi.im.lcs.transtools.redis.RedisLcsRegistry;
+import com.alanpoi.im.lcs.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,11 +45,16 @@ public class LcsRegistryConfig {
         config.setMinIdle(minIdle);
         logger.info("receiverJedisPool config host:[{}] port:[{}] password:[{}] timeout:[{}] maxActive:[{}] maxWait:[{}] maxIdle:[{}] minIdle:[{}]",
                 host, port, password, timeout, maxActive, maxWait, maxIdle, minIdle);
-        return new JedisPool(config, host, port, timeout, password);
+        if (StringUtils.isBlank(password)) {
+            return new JedisPool(config, host, port, timeout);
+        } else {
+            return new JedisPool(config, host, port, timeout, password);
+        }
+
     }
 
     @Bean
-    public LcsRegistry getLcsRegistry(@Qualifier("RedisLcsRegistryPool") JedisPool jedisPool){
+    public LcsRegistry getLcsRegistry(@Qualifier("RedisLcsRegistryPool") JedisPool jedisPool) {
         return new RedisLcsRegistry(4, jedisPool);
     }
 }
