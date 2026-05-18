@@ -2,16 +2,12 @@ package com.alanpoi.im.lcs.event.listener;
 
 import com.alanpoi.im.lcs.imsignal.SignalException;
 import com.alanpoi.im.lcs.imsignal.SignalProto;
-//import com.alibaba.csp.sentinel.Entry;
-//import com.alibaba.csp.sentinel.EntryType;
-//import com.alibaba.csp.sentinel.SphU;
-//import com.alibaba.csp.sentinel.slots.block.BlockException;
+
 import com.alanpoi.im.message.service.MessageService;
 import com.alanpoi.im.message.service.req.MsgSendReq;
+import com.alanpoi.im.message.service.rsp.MessageException;
 import com.alanpoi.im.message.service.rsp.MsgSendVO;
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.qzd.im.common.event2.annotation.EventMapping;
-import com.qzd.im.common.response.CommonError;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.event.EventConfig;
 import com.alanpoi.im.lcs.event.model.SendMsgEvent;
@@ -42,21 +38,14 @@ public class SendMsgListener {
         int code = IMError.SUCCESS.getCode();
         String errMsg = IMError.SUCCESS.getMsg();
         try {
-            UserChannel.ID id = userChannel.getId();
-//            try (Entry entry = SphU.entry("SendMsg", EntryType.IN, 1,
-//                    id.getUserId(), id.getCompanyId(), req.getTo())) {
-                res = callSendMsg(userChannel, req);
+//            UserChannel.ID id = userChannel.getId();
+            res = callSendMsg(userChannel, req);
 //            }
             logger.info("sendMsg success convId:[{}] msgId:[{}]", req.getTo(), res.getMessageId());
-        }
-        catch (SignalException e) {
+        } catch (SignalException e) {
             code = e.getCode();
             errMsg = e.getMessage();
         }
-//        catch (BlockException e){
-//            code = CommonError.ERROR_REQUEST_FREQUENTLY.getCode();
-//            errMsg = CommonError.ERROR_REQUEST_FREQUENTLY.getMsg();
-//        }
         ResponseUtil.respond(event.getSecpMessage(), userChannel, SignalProto.Cmd.SEND_MSG_RES_VALUE, code, errMsg, res);
     }
 
@@ -73,7 +62,6 @@ public class SendMsgListener {
             msgSendReq.setClientMsgId(msg.getClientMsgId());
             msgSendReq.setCustomInfo(msg.getCustomInfo());
             msgSendReq.setIdempotentId(msg.getIdempotentId());
-            msgSendReq.setCompanyId(userChannel.getId().getCompanyId());
             //RPC调用消息接口
             msgSendVO = messageService.sendMessage(msgSendReq);
 
@@ -83,8 +71,11 @@ public class SendMsgListener {
                     .build();
 
             return res;
-        } catch (Exception e) {
+        } catch (MessageException e) {
             logger.error("callSendMsg error convId:[{}]", msg.getTo(), e);
+            throw new SignalException(e.getCode(), e.getMessage());
+        } catch (Exception e1) {
+            logger.error("callSendMsg error convId:[{}]", msg.getTo(), e1);
             throw new SignalException(IMError.UNKNOWN);
         }
     }

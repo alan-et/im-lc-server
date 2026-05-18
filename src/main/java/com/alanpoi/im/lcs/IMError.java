@@ -2,10 +2,10 @@ package com.alanpoi.im.lcs;
 
 public enum IMError {
 	SUCCESS(0, "SUCCESS"),
-	UNKNOWN(1, "unknown"),
+	UNKNOWN(1, "unknown "),
 
-	SESSION_EXPIRED(0X0101, "session expired");
-
+	SESSION_EXPIRED(0X0101, "session expired"),
+	SEND_MSG_FAIL(0x0201, "send fail");
 
 	
 	private int code;
