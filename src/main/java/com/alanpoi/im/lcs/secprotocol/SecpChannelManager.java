@@ -22,7 +22,9 @@ public class SecpChannelManager {
     private static final Logger log = LoggerFactory.getLogger(SecpChannelManager.class);
 
     private static final int CHANNEL_TIMEOUT = 30000; //新channel超时时间
-    public static final int HEARTBEAT_TIMEOUT = 12 * 60 * 1000; //session心跳超时时间
+//    public static final int HEARTBEAT_TIMEOUT = 12 * 60 * 1000; //session心跳超时时间
+
+    public static final int HEARTBEAT_TIMEOUT = 60 * 1000; //session心跳超时时间
 
     private volatile boolean isStart = false;
     private Thread thrWorker = null;

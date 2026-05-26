@@ -89,6 +89,9 @@ public class SignalHandler {
 //                    this.reportProcess(uchnl, reqHeader, userProcessSig);
                     eventProducer.post(new ReportProcessEvent(uchnl, msg, reqHeader, userProcessSig));
                     break;
+                case SignalProto.Cmd.BUSI_VALUE:
+                    SignalProto.OthBusiSig othBusiSig=SignalProto.OthBusiSig.parseFrom(reqFull.getBody());
+                    break;
             }
         } catch (InvalidProtocolBufferException e) {
             log.error("pare pb body error:", e);

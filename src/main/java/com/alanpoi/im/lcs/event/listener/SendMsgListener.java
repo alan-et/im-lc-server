@@ -57,6 +57,7 @@ public class SendMsgListener {
             msgSendReq.setConversation(Byte.valueOf(msg.getConversation().getNumber() + ""));
             msgSendReq.setFrom(msg.getFrom());
             msgSendReq.setTo(msg.getTo());
+            msgSendReq.setClientType(userChannel.getClientType());
             msgSendReq.setContentType(msg.getContentType());
             msgSendReq.setContent(msg.getContent());
             msgSendReq.setClientMsgId(msg.getClientMsgId());

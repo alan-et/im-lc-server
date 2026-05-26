@@ -71,26 +71,26 @@ public class DefaultListener {
     }
 
     private void frontProcess(String userId, String companyId, int clientType) {
-        logger.info("frontProcess userId:[{}] companyId:[{}] clientType:[{}] ",
-                userId, companyId, clientType);
+//        logger.info("frontProcess userId:[{}] companyId:[{}] clientType:[{}] ",
+//                userId, companyId, clientType);
         //移动端上报才写入
-        if (clientType == SignalProto.ClientType.IPHONE_VALUE
-                || clientType == SignalProto.ClientType.IPAD_VALUE
-                || clientType == SignalProto.ClientType.ANDROID_VALUE) {
-            String key = "UserProcess:" + userId + ":" + companyId;
+//        if (clientType == SignalProto.ClientType.IPHONE_VALUE
+//                || clientType == SignalProto.ClientType.IPAD_VALUE
+//                || clientType == SignalProto.ClientType.ANDROID_VALUE) {
+            String key = "UserProcess:" + userId;
             String servId = "" + serverID.getId();
             redis.opsForValue().set(key, servId, TimeConstants.DAY_15, TimeUnit.SECONDS);
-        }
+//        }
     }
 
     private void backProcess(String userId, String companyId, int clientType, Integer badge) {
-        logger.info("backProcess userId:[{}] companyId:[{}] clientType:[{}] badge:[{}]",
-                userId, companyId, clientType, badge);
+//        logger.info("backProcess userId:[{}] companyId:[{}] clientType:[{}] badge:[{}]",
+//                userId, companyId, clientType, badge);
         //移动端上报才写入
-        if (clientType == SignalProto.ClientType.IPHONE_VALUE
-                || clientType == SignalProto.ClientType.IPAD_VALUE
-                || clientType == SignalProto.ClientType.ANDROID_VALUE) {
-            String key = "UserProcess:" + userId + ":" + companyId;
+//        if (clientType == SignalProto.ClientType.IPHONE_VALUE
+//                || clientType == SignalProto.ClientType.IPAD_VALUE
+//                || clientType == SignalProto.ClientType.ANDROID_VALUE) {
+            String key = "UserProcess:" + userId;
 
             String servIdInRedis = redis.opsForValue().get(key);
             String servId = "" + serverID.getId();
@@ -101,7 +101,7 @@ public class DefaultListener {
             if (badge != null) {
 //                pushSvc.setBadge(userId, companyId, badge);
             }
-        }
+//        }
     }
 
 

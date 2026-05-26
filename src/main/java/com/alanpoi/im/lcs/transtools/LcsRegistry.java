@@ -15,9 +15,9 @@ public interface LcsRegistry {
     void destroy();
 
     //注册信息
-    void registerUser(String userId, String companyId);
+    void registerUser(String userId);
 
     //注销用户信息
-    void unregisterUser(String userId, String companyId);
+    void unregisterUser(String userId);
 
 }

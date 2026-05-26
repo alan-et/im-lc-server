@@ -180,7 +180,6 @@ public class SecpHandler extends SimpleChannelInboundHandler<SecpMessage> {
 		try {
 			buf.writeLong(secpChnl.getLcId());
 			secpChnl.respond(msg, buf);
-			log.info("已发送消息");
 		}finally {
 			buf.release();
 		}

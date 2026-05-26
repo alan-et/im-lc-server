@@ -3,6 +3,7 @@ package com.alanpoi.im.lcs.transtools;
 import com.qzd.im.common.constants.TimeConstants;
 import com.qzd.im.common.model.PersonId;
 import com.alanpoi.im.lcs.transtools.redis.RedisKey;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -29,7 +30,7 @@ public class UserActiveManager {
             String key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId());
             jedis.setex(key, TimeConstants.DAY_30, "" + System.currentTimeMillis());
 
-            if (personId.getCompanyId() != null) {
+            if (StringUtils.isBlank(personId.getCompanyId())) {
                 key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId(), personId.getCompanyId());
                 jedis.setex(key, TimeConstants.DAY_30, "" + System.currentTimeMillis());
             }
@@ -44,10 +45,10 @@ public class UserActiveManager {
         if (personId.getUserId() == null) return false;
         try (Jedis jedis = jedisPool.getResource()) {
             String key = null;
-            if (personId.getCompanyId() == null) {
-                key = RedisKey.genKey(RedisKey.USER_SERVER, personId.getUserId());
+            if (StringUtils.isBlank(personId.getCompanyId())) {
+                key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId());
             } else {
-                key = RedisKey.genKey(RedisKey.USER_SERVER, personId.getUserId(), personId.getCompanyId());
+                key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId(), personId.getCompanyId());
             }
             String val = jedis.get(key);
             return val != null && val.trim().length() > 0;
@@ -60,7 +61,39 @@ public class UserActiveManager {
         List<String> keys = new ArrayList<>(personIds.size());
         for (PersonId personId : personIds) {
             String key = null;
-            if (personId.getCompanyId() == null) {
+            if (StringUtils.isBlank(personId.getCompanyId())) {
+                key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId());
+            } else {
+                key = RedisKey.genKey(RedisKey.USER_ACTIVE, personId.getUserId(), personId.getCompanyId());
+            }
+            keys.add(key);
+        }
+        if (keys.isEmpty()) return Collections.emptySet();
+        Set<PersonId> res = new HashSet<>();
+        List<String> values = null;
+        try (Jedis jedis = jedisPool.getResource()) {
+            values = jedis.mget(keys.toArray(new String[0]));
+        }
+        if (values != null && values.size() > 0) {
+            for (int i = 0; i < personIds.size(); ++i) {
+                PersonId personId = personIds.get(i);
+
+                String val = values.get(i);
+                if (val != null && val.length() > 0) {
+                    res.add(personId);
+                }
+            }
+        }
+        return res;
+    }
+
+    public Set<PersonId> getOnlinePersons(List<PersonId> personIds) {
+        if (personIds == null || personIds.isEmpty()) return Collections.emptySet();
+
+        List<String> keys = new ArrayList<>(personIds.size());
+        for (PersonId personId : personIds) {
+            String key = null;
+            if (StringUtils.isBlank(personId.getCompanyId())) {
                 key = RedisKey.genKey(RedisKey.USER_SERVER, personId.getUserId());
             } else {
                 key = RedisKey.genKey(RedisKey.USER_SERVER, personId.getUserId(), personId.getCompanyId());

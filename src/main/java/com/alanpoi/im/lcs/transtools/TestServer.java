@@ -42,7 +42,7 @@ public class TestServer {
 
 
 
-        registry.registerUser("2", "2");
+        registry.registerUser("2");
     }
 
     @ChannelHandler.Sharable

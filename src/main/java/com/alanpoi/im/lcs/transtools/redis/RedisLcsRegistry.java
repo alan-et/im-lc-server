@@ -70,18 +70,15 @@ public class RedisLcsRegistry extends AbstractLcsRegistry {
     }
 
     @Override
-    protected void doRegisterUser(String userId, String companyId) {
+    protected void doRegisterUser(String userId) {
         String strServerId = lcs.getStringId();
         try {
-            userActiveManager.active(new PersonId(companyId, userId));
+            userActiveManager.active(new PersonId("", userId));
 
             String key = RedisKey.genKey(RedisKey.USER_SERVER, userId);
             doWriteServerId(key, strServerId);
 
-            key = RedisKey.genKey(RedisKey.USER_SERVER, userId, companyId);
-            doWriteServerId(key, strServerId);
-
-            log.info("registerUser. userId:{}, companyId:{} lcsId:{}({})", userId, companyId, lcs.getId(), strServerId);
+            log.info("registerUser. userId:{}, lcsId:{}({})", userId, lcs.getId(), strServerId);
         }catch (Exception e){
             log.error("", e);
         }
@@ -140,7 +137,7 @@ public class RedisLcsRegistry extends AbstractLcsRegistry {
     }
 
     @Override
-    protected void doUnregisterUser(String userId, String companyId) {
+    protected void doUnregisterUser(String userId) {
         if (userId == null){
             log.warn("doUnregisterUser userId is null");
             return;
@@ -148,17 +145,12 @@ public class RedisLcsRegistry extends AbstractLcsRegistry {
 
         String strServerId = lcs.getStringId();
         try {
-            if (companyId == null) {
-                String key = RedisKey.genKey(RedisKey.USER_SERVER, userId);
-                doDelSeverId(key, strServerId);
-            } else {
-                String key = RedisKey.genKey(RedisKey.USER_SERVER, userId, companyId);
-                doDelSeverId(key, strServerId);
-            }
-            log.info("unregisterUser. userId:{}, companyId:{} lcsId:{}({})", userId, companyId, lcs.getId(), strServerId);
+            String key = RedisKey.genKey(RedisKey.USER_SERVER, userId);
+            doDelSeverId(key, strServerId);
+            log.info("unregisterUser. userId:{}, lcsId:{}({})", userId, lcs.getId(), strServerId);
 
         } catch (Exception e) {
-            log.error("doUnregisterUser [{}]-[{}] error", userId, companyId, e);
+            log.error("doUnregisterUser [{}] error", userId, e);
         }
     }
 

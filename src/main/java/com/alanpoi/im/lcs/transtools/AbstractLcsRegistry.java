@@ -66,22 +66,22 @@ public abstract class AbstractLcsRegistry implements LcsRegistry {
     }
 
     @Override
-    public void registerUser(String userId, String companyId) {
+    public void registerUser(String userId) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                doRegisterUser(userId, companyId);
+                doRegisterUser(userId);
             }
         });
     }
 
 
     @Override
-    public void unregisterUser(String userId, String companyId) {
+    public void unregisterUser(String userId) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                doUnregisterUser(userId, companyId);
+                doUnregisterUser(userId);
             }
         });
     }
@@ -91,7 +91,7 @@ public abstract class AbstractLcsRegistry implements LcsRegistry {
     protected abstract void doDestroy();
     protected abstract void doHeartbeat();
     protected abstract void doClearInvalidLcsInfo();
-    protected abstract void doRegisterUser(String userId, String companyId);
-    protected abstract void doUnregisterUser(String userId, String companyId);
+    protected abstract void doRegisterUser(String userId);
+    protected abstract void doUnregisterUser(String userId);
 
 }

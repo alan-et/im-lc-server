@@ -32,8 +32,7 @@ public class UserChannelManager {
         }*/
         for (String personIdStr : personMap.keySet()) {
             PersonId personId = PersonId.parse(personIdStr);
-            lcsResgistry.unregisterUser(personId.getUserId(), null);
-            lcsResgistry.unregisterUser(personId.getUserId(), personId.getCompanyId());
+            lcsResgistry.unregisterUser(personId.getUserId());
         }
     }
 
@@ -48,10 +47,10 @@ public class UserChannelManager {
         addToMap(userMap, userId, channelId);
         //receiver.addUser(userId);
 
-        String companyId = channel.getId().getCompanyId();
-        addToMap(personMap, new PersonId(companyId, userId).toString(), channelId);
+//        String companyId = channel.getId().getCompanyId();
+//        addToMap(personMap, new PersonId(companyId, userId).toString(), channelId);
         //receiver.addPerson(userId, companyId);
-        lcsResgistry.registerUser(userId, companyId);
+        lcsResgistry.registerUser(userId);
 
         return channel;
     }
@@ -65,18 +64,18 @@ public class UserChannelManager {
         String companyId = channel.getId().getCompanyId();
 
         removeFromMap(userMap, userId, channelId);
-        removeFromMap(personMap, new PersonId(companyId, userId).toString(), channelId);
+//        removeFromMap(personMap, new PersonId(companyId, userId).toString(), channelId);
 
         List<UserChannel> userChannelList = findByUserId(userId);
         if (userChannelList == null || userChannelList.size() == 0) {
             //receiver.delUser(userId);
-            lcsResgistry.unregisterUser(userId, null);
+            lcsResgistry.unregisterUser(userId);
         }
-        List<UserChannel> personChannelList = findByPersonId(userId, companyId);
-        if (personChannelList == null || personChannelList.size() == 0) {
-            //receiver.delPerson(userId, companyId);
-            lcsResgistry.unregisterUser(userId, companyId);
-        }
+//        List<UserChannel> personChannelList = findByPersonId(userId, companyId);
+//        if (personChannelList == null || personChannelList.size() == 0) {
+//            //receiver.delPerson(userId, companyId);
+//            lcsResgistry.unregisterUser(userId, companyId);
+//        }
 
         return channel;
     }
