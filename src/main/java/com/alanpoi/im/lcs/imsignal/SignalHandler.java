@@ -7,6 +7,7 @@ import com.qzd.im.common.event2.EventProducer;
 import com.qzd.im.common.response.CommonError;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.event.model.BackProcessEvent;
+import com.alanpoi.im.lcs.event.model.CallEvent;
 import com.alanpoi.im.lcs.event.model.ReportProcessEvent;
 import com.alanpoi.im.lcs.event.model.SendMsgEvent;
 import com.alanpoi.im.lcs.rabbitmq.RabbitPublisher;
@@ -89,9 +90,12 @@ public class SignalHandler {
 //                    this.reportProcess(uchnl, reqHeader, userProcessSig);
                     eventProducer.post(new ReportProcessEvent(uchnl, msg, reqHeader, userProcessSig));
                     break;
-                case SignalProto.Cmd.BUSI_VALUE:
-                    SignalProto.OthBusiSig othBusiSig=SignalProto.OthBusiSig.parseFrom(reqFull.getBody());
+                case SignalProto.Cmd.OTHER_BUSI_VALUE:
+                case SignalProto.Cmd.BUSI_VALUE: {
+                    SignalProto.OthBusiSig othBusiSig = SignalProto.OthBusiSig.parseFrom(reqFull.getBody());
+                    eventProducer.post(new CallEvent(uchnl, msg, reqHeader, othBusiSig));
                     break;
+                }
             }
         } catch (InvalidProtocolBufferException e) {
             log.error("pare pb body error:", e);

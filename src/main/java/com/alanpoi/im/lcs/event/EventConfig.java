@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EventConfig {
     public static final String EXECUTOR_SEND_MSG = "sendMsg";
+    public static final String EXECUTOR_CALL = "call";
 
     @Bean
     public EventProducer eventProducer() {
