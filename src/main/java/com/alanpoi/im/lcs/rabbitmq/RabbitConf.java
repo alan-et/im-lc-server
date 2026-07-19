@@ -1,5 +1,7 @@
 package com.alanpoi.im.lcs.rabbitmq;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
@@ -15,6 +17,8 @@ import java.util.HashMap;
 
 @Configuration
 public class RabbitConf {
+    private static final Logger log = LoggerFactory.getLogger(RabbitConf.class);
+
     @Value("${qzdim.rabbitmq.virtual-host:}")
     private String vhost;
 
@@ -60,6 +64,18 @@ public class RabbitConf {
     public RabbitTemplate getRabbitTemplate(ConnectionFactory factory){
         RabbitTemplate rabbit = new RabbitTemplate(factory);
         //rabbit.setRoutingKey(queueName);
+
+        // mandatory + 返回回调:消息若没有匹配到任何队列(例如 amq.direct 上的绑定意外缺失),
+        // broker 会把消息退回,这里打 ERROR 日志。否则这类投递会被 broker 静默丢弃、无任何痕迹,
+        // 事后极难排查(用户上线事件丢失 → 下游订阅方全部失效)。
+        rabbit.setMandatory(true);
+        rabbit.setReturnsCallback(returned ->
+                log.error("MQ message unroutable, dropped! exchange:[{}] routingKey:[{}] replyCode:[{}] replyText:[{}] body:[{}]",
+                        returned.getExchange(),
+                        returned.getRoutingKey(),
+                        returned.getReplyCode(),
+                        returned.getReplyText(),
+                        new String(returned.getMessage().getBody())));
         return  rabbit;
     }
 

@@ -8,6 +8,7 @@ import com.qzd.im.common.response.CommonError;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.event.model.BackProcessEvent;
 import com.alanpoi.im.lcs.event.model.CallEvent;
+import com.alanpoi.im.lcs.event.model.CallSignalEvent;
 import com.alanpoi.im.lcs.event.model.ReportProcessEvent;
 import com.alanpoi.im.lcs.event.model.SendMsgEvent;
 import com.alanpoi.im.lcs.rabbitmq.RabbitPublisher;
@@ -94,6 +95,11 @@ public class SignalHandler {
                 case SignalProto.Cmd.BUSI_VALUE: {
                     SignalProto.OthBusiSig othBusiSig = SignalProto.OthBusiSig.parseFrom(reqFull.getBody());
                     eventProducer.post(new CallEvent(uchnl, msg, reqHeader, othBusiSig));
+                    break;
+                }
+                case SignalProto.Cmd.CALL_SIGNAL_VALUE: {
+                    SignalProto.CallSignal callSig = SignalProto.CallSignal.parseFrom(reqFull.getBody());
+                    eventProducer.post(new CallSignalEvent(uchnl, msg, reqHeader, callSig));
                     break;
                 }
             }
