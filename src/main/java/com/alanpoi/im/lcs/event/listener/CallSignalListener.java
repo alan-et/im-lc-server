@@ -189,6 +189,10 @@ public class CallSignalListener {
             case SignalProto.CallSignalType.CALL_CANCEL_VALUE:
             case SignalProto.CallSignalType.CALL_BUSY_VALUE:
             case SignalProto.CallSignalType.CALL_HANGUP_VALUE:
+            // 振铃超时:主叫直发 CALL_END 让被叫停止响铃,随后自己退房。
+            // 刻意不放进 isTerminalType —— 它只做纯 fan-out 转发,不转去 im-api 写通话记录;
+            // 记录由主叫退房后 LiveKit webhook 触发的 finalizeRoom 生成("无人应答")。
+            case SignalProto.CallSignalType.CALL_END_VALUE:
                 return true;
             default:
                 return false;
