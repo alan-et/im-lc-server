@@ -159,7 +159,10 @@ public class CallSignalListener {
         headers.set("userId", senderUserId);
         headers.set("clientType", String.valueOf(event.getReqHeader().getClientType()));
         String token = event.getReqHeader().getToken();
-        headers.set("apptoken", StringUtils.isNotEmpty(token) ? token : "internal-ws-relay");
+        // 鉴权头已由 apptoken 改名为 token;两个都发,兼容尚未升级的 im-api 实例
+        String tokenValue = StringUtils.isNotEmpty(token) ? token : "internal-ws-relay";
+        headers.set("token", tokenValue);
+        headers.set("apptoken", tokenValue);
         if (StringUtils.isNotEmpty(event.getReqHeader().getCompanyId())) {
             headers.set("companyId", event.getReqHeader().getCompanyId());
         }
