@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisClientConfig;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -34,6 +37,9 @@ public class LcsRegistryConfig {
     @Value("${spring.redis.minIdle:}")
     private int minIdle = 2;
 
+    @Value("${spring.redis.database:0}")
+    private int database;
+
 
     @Bean("RedisLcsRegistryPool")
     public JedisPool receiverJedisPool() {
@@ -43,13 +49,17 @@ public class LcsRegistryConfig {
         config.setMaxWaitMillis(maxWait);
         config.setMaxIdle(maxIdle);
         config.setMinIdle(minIdle);
-        logger.info("receiverJedisPool config host:[{}] port:[{}] password:[{}] timeout:[{}] maxActive:[{}] maxWait:[{}] maxIdle:[{}] minIdle:[{}]",
-                host, port, password, timeout, maxActive, maxWait, maxIdle, minIdle);
-        if (StringUtils.isBlank(password)) {
-            return new JedisPool(config, host, port, timeout);
-        } else {
-            return new JedisPool(config, host, port, timeout, password);
-        }
+        logger.info("receiverJedisPool config host:[{}] port:[{}] database:[{}] password:[{}] timeout:[{}] maxActive:[{}] maxWait:[{}] maxIdle:[{}] minIdle:[{}]",
+                host, port, database, StringUtils.isBlank(password) ? "none" : "set",
+                timeout, maxActive, maxWait, maxIdle, minIdle);
+
+        JedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
+                .connectionTimeoutMillis(timeout)
+                .socketTimeoutMillis(timeout)
+                .database(database)
+                .password(StringUtils.isBlank(password) ? null : password)
+                .build();
+        return new JedisPool(config, new HostAndPort(host, port), clientConfig);
 
     }
 

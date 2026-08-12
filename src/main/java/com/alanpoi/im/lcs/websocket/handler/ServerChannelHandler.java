@@ -141,32 +141,21 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            IdleStateEvent stateEvent = (IdleStateEvent) evt;
-            PingWebSocketFrame ping = new PingWebSocketFrame();
-            switch (stateEvent.state()) {
-                //读空闲（服务器端）
-                case READER_IDLE:
-                    log.info("【" + ctx.channel().remoteAddress() + "】读空闲（服务器端）");
-                    SecpMessage message = new SecpMessage();
-                    message.setCmd(Cmd.HEARTBEAT_REQ);
-                    message.setBody("ping".getBytes());
-                    ctx.channel().write(message);
-                    //ctx.writeAndFlush(message);
-                    break;
-                //写空闲（客户端）
-                case WRITER_IDLE:
-                    log.info("【" + ctx.channel().remoteAddress() + "】写空闲（客户端）");
-                    SecpMessage message2 = new SecpMessage();
-                    message2.setCmd(Cmd.HEARTBEAT_REQ);
-                    message2.setBody("ping".getBytes());
-                    ctx.channel().write(message2);
-                    //ctx.writeAndFlush(ping);
-                    break;
-                case ALL_IDLE:
-                    log.info("【" + ctx.channel().remoteAddress() + "】读写空闲");
-                    break;
-            }
+            // 连接安静了(读写都空闲),发一个协议层 Ping 帧保活。
+            //
+            // 必须是 PingWebSocketFrame,不能是应用层的 Cmd.HEARTBEAT_REQ ——
+            // 协议层 Ping 由浏览器的网络层自动回 Pong,不进 JS 事件循环,
+            // 因此后台标签页被节流时依然有效;应用层心跳要靠 JS 回复,后台会被压到约 1 分钟一次,
+            // 赶不上中间设备(ALB 默认 60s)的空闲超时。
+            //
+            // 用 writeAndFlush 而不是 write:这里是空闲事件不是读事件,
+            // 后面不会有 channelReadComplete 来补 flush,只 write 的话会一直躺在出站缓冲区里发不出去。
+            //
+            // 帧本身不带 payload —— 它的唯一作用就是产生一次链路上的流量,让各级空闲计时器归零。
+            ctx.writeAndFlush(new PingWebSocketFrame());
+            return;
         }
+        super.userEventTriggered(ctx, evt);
     }
 
     /**
@@ -192,11 +181,19 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
             secpMessage.setBody(((SignalProto.SignalRequest) msg).toByteArray());
             recvSignal(secpChnl, secpMessage);
         } else if (msg instanceof PingWebSocketFrame) {
+            // 客户端主动心跳(iOS/PC 每 30 秒一次)。回的 SecpMessage 会被 WebsocketEncoder
+            // 转成 PongWebSocketFrame,符合 RFC 6455「收到 Ping 必须回 Pong」。
             secpChnl.setTimeStamp(System.currentTimeMillis());
             SecpMessage message = new SecpMessage();
             message.setCmd(Cmd.HEARTBEAT_REQ);
             message.setBody("pong".getBytes());
             ctx.channel().write(message);
+        } else if (msg instanceof PongWebSocketFrame) {
+            // 服务端 Ping 之后浏览器/客户端自动回的 Pong。
+            // 只刷新活跃时间,不做任何回复 —— 回了就会变成「Pong 触发 Ping、Ping 触发 Pong」的
+            // 自激循环,频率只受 RTT 限制,每条连接每秒能打出上千帧。
+            // 保活的节奏由 IdleStateHandler 控制,不该由收包来驱动。
+            secpChnl.setTimeStamp(System.currentTimeMillis());
         }
     }
 

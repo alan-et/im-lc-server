@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * websocket 服务
@@ -29,6 +31,13 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class WebsocketServer {
+
+    /**
+     * 心跳间隔(秒)。必须<b>小于链路上最小的那个空闲超时</b> ——
+     * ALB 默认 60s、Nginx proxy_read_timeout 默认 60s,取 30s 留一倍余量。
+     * 改大之前先确认 ALB 上的实际配置。
+     */
+    private static final int HEARTBEAT_IDLE_SECONDS = 30;
 
     private static final Logger log = LoggerFactory.getLogger(WebsocketServer.class);
 
@@ -62,14 +71,27 @@ public class WebsocketServer {
                             socketChannel.pipeline().addLast(new WebSocketServerCompressionHandler());
                             // 协议包长度限制
                             //socketChannel.pipeline().addLast(new WebSocketServerProtocolHandler("/ws", null, true));
+                            // 心跳:ALL_IDLE 30 秒(读写都空闲)触发,由服务端主动发 WebSocket Ping 帧。
+                            //
+                            // 浏览器的 JS 没有发送 Ping 帧的 API,只能用 send()
+                            // 发应用层心跳;而后台标签页的定时器会被 Chrome 压到约 1 分钟一次,
+                            // 心跳还没发出去连接就被中间设备(ALB 默认空闲 60s)踢了。
+                            // 反过来由服务端发 Ping,浏览器在网络层自动回 Pong,不经过 JS,不受节流影响。
+                            //
+                            // 放在解码器之前:这样读写计数看到的是原始帧,不受 WebsocketDecoder
+                            // 过滤规则的影响(它只放行 Ping/Pong/Binary)。
+                            //
+                            // 只开 ALL_IDLE、不开 READER_IDLE 的关闭逻辑:目前没有任何空闲超时,
+                            // 贸然加"读空闲即关闭"可能误杀存活但安静的 iOS/PC 连接。保活是本次目标,
+                            // 死连接检测是另一件事,要做再单独评估。
+                            socketChannel.pipeline().addLast(
+                                    new IdleStateHandler(0, 0, HEARTBEAT_IDLE_SECONDS, TimeUnit.SECONDS));
                             // 协议包解码
                             socketChannel.pipeline().addLast(new WebsocketDecoder());
                             // 协议包编码
                             socketChannel.pipeline().addLast(new WebsocketEncoder());
                              // 协议包解码时指定Protobuf字节数实例化为CommonProtocol类型
                             //socketChannel.pipeline().addLast(new ProtobufDecoder(SignalProto.SignalRequest.getDefaultInstance()));
-                            // 进行设置心跳检测
-                            //socketChannel.pipeline().addLast(new IdleStateHandler(60, 30, 60 * 30, TimeUnit.SECONDS));
                             // 配置通道处理  来进行业务处理
                             socketChannel.pipeline().addLast(executor,serverChannelHandler);
                         }

@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -13,6 +16,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 /**
  * Redis 配置类
@@ -40,6 +44,9 @@ public class RedisConfig {
      */
     @Value("${spring.redis.port:6379}")
     public int port;
+
+    @Value("${spring.redis.database:0}")
+    public int database;
 
     /**
      * Redis服务名称
@@ -160,6 +167,13 @@ public class RedisConfig {
         this.timeout = timeout;
     }
 
+    public int getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(int database) {
+        this.database = database;
+    }
 
     @Bean
     public JedisPoolConfig jedisPoolConfig() {
@@ -190,15 +204,25 @@ public class RedisConfig {
      */
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jrcFactory = new JedisConnectionFactory();
-        jrcFactory.setHostName(this.getHost());
-        String password=this.getPassword();
+        RedisStandaloneConfiguration standalone = new RedisStandaloneConfiguration();
+        standalone.setHostName(this.getHost());
+        standalone.setPort(this.getPort());
+        standalone.setDatabase(this.getDatabase());
+        String password = this.getPassword();
         if (StringUtils.isNotEmpty(password)) {
-            jrcFactory.setPassword(password);
+            standalone.setPassword(RedisPassword.of(password));
         }
-        jrcFactory.setPort(this.getPort());
-        jrcFactory.setPoolConfig(jedisPoolConfig());
-        return jrcFactory;
+
+        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder()
+                .usePooling().poolConfig(jedisPoolConfig()).and()
+                .connectTimeout(Duration.ofMillis(this.getTimeout()))
+                .readTimeout(Duration.ofMillis(this.getTimeout()))
+                .build();
+
+        logger.info("jedisConnectionFactory host:[{}] port:[{}] database:[{}] password:[{}] timeout:[{}]",
+                this.getHost(), this.getPort(), this.getDatabase(),
+                StringUtils.isNotEmpty(password) ? "set" : "none", this.getTimeout());
+        return new JedisConnectionFactory(standalone, clientConfig);
     }
 
 }
