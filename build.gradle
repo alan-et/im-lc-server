@@ -74,6 +74,7 @@ dependencies {
     implementation group: 'com.alanpoi.im', name: 'im-common-lib', version: '1.0.0-SNAPSHOT'
     implementation group: 'com.alanpoi.im', name: 'im-message-servie', version: '0.0.2-SNAPSHOT'
     implementation group: 'com.alanpoi.im', name: 'im-sigTranspond-servie', version: '0.0.1-SNAPSHOT'
+    implementation group: 'com.alanpoi.im', name: 'im-meeting-serve', version: '0.0.4-SNAPSHOT'
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation 'junit:junit:4.13.2'
