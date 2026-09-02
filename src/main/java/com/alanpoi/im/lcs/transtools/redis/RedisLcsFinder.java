@@ -1,6 +1,6 @@
 package com.alanpoi.im.lcs.transtools.redis;
 
-import com.qzd.im.common.model.PersonId;
+import com.alanpoi.im.common.model.PersonId;
 import com.alanpoi.im.lcs.transtools.AbstractLcsFinder;
 import com.alanpoi.im.lcs.transtools.LcsInfo;
 import com.alanpoi.im.lcs.transtools.network.TcpClientConnector;

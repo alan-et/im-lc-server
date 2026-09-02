@@ -1,6 +1,6 @@
 package com.alanpoi.im.lcs.transtools;
 
-import com.qzd.im.common.model.PersonId;
+import com.alanpoi.im.common.model.PersonId;
 import com.alanpoi.im.lcs.transtools.network.Frame;
 import com.alanpoi.im.lcs.transtools.network.TcpClientConnector;
 import com.alanpoi.im.lcs.transtools.network.TcpClientLogHandler;

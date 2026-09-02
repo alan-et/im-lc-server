@@ -1,9 +1,9 @@
 package com.alanpoi.im.lcs.event.listener;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.qzd.im.common.constants.TimeConstants;
-import com.qzd.im.common.event2.annotation.EventMapping;
-import com.qzd.im.common.id.ServerID;
+import com.alanpoi.im.common.constants.TimeConstants;
+import com.alanpoi.im.common.event2.annotation.EventMapping;
+import com.alanpoi.im.common.id.ServerID;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.event.model.BackProcessEvent;
 import com.alanpoi.im.lcs.event.model.ReportProcessEvent;

@@ -3,11 +3,15 @@ package com.alanpoi.im.lcs.event.listener;
 import com.alanpoi.im.lcs.imsignal.SignalException;
 import com.alanpoi.im.lcs.imsignal.SignalProto;
 
+import com.alanpoi.im.meeting.service.IMeetingService;
+import com.alanpoi.im.meeting.service.MeetingRsp;
+import com.alanpoi.im.meeting.service.vo.MeetingChatReq;
+import com.alanpoi.im.meeting.service.vo.MeetingChatVO;
 import com.alanpoi.im.message.service.MessageService;
 import com.alanpoi.im.message.service.req.MsgSendReq;
 import com.alanpoi.im.message.service.rsp.MessageException;
 import com.alanpoi.im.message.service.rsp.MsgSendVO;
-import com.qzd.im.common.event2.annotation.EventMapping;
+import com.alanpoi.im.common.event2.annotation.EventMapping;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.event.EventConfig;
 import com.alanpoi.im.lcs.event.model.SendMsgEvent;
@@ -25,23 +29,27 @@ public class SendMsgListener {
     @DubboReference
     private MessageService messageService;
 
+    @DubboReference
+    private IMeetingService meetingService;
+
     @EventMapping(executor = EventConfig.EXECUTOR_SEND_MSG)
     public void onSendMsg(SendMsgEvent event) {
         UserChannel userChannel = event.getUserChannel();
         SignalProto.SendMsgReq req = event.getReq();
-
         //转发到message模块
-        logger.info("sendMessage conversation:{} from:{} to:{} contentType:{} content:{}",
+        logger.debug("sendMessage conversation:{} from:{} to:{} contentType:{} content:{}",
                 req.getConversation(), req.getFrom(), req.getTo(), req.getContentType(), trimContent(req.getContent()));
         //调用发送消息接口
         SignalProto.SendMsgRes res = null;
         int code = IMError.SUCCESS.getCode();
         String errMsg = IMError.SUCCESS.getMsg();
         try {
-//            UserChannel.ID id = userChannel.getId();
-            res = callSendMsg(userChannel, req);
-//            }
-            logger.info("sendMsg success convId:[{}] msgId:[{}]", req.getTo(), res.getMessageId());
+            if (req.getConversation() == SignalProto.ConversationType.MEETING) {
+                res = callSendMsgByMeet(userChannel, req);
+            } else {
+                res = callSendMsg(userChannel, req);
+            }
+            logger.debug("sendMsg success convId:[{}] msgId:[{}]", req.getTo(), res.getMessageId());
         } catch (SignalException e) {
             code = e.getCode();
             errMsg = e.getMessage();
@@ -77,6 +85,46 @@ public class SendMsgListener {
             throw new SignalException(e.getCode(), e.getMessage());
         } catch (Exception e1) {
             logger.error("callSendMsg error convId:[{}]", msg.getTo(), e1);
+            throw new SignalException(IMError.UNKNOWN);
+        }
+    }
+
+    public SignalProto.SendMsgRes callSendMsgByMeet(UserChannel userChannel, SignalProto.SendMsgReq msg) throws SignalException {
+        if (msg == null || StringUtils.isEmpty(msg.getTo()) || StringUtils.isEmpty(msg.getContent())) {
+            throw new SignalException(IMError.SEND_MSG_FAIL.getCode(), "会议号和消息内容不能为空");
+        }
+        try {
+            MeetingChatReq meetingChatReq = new MeetingChatReq();
+            meetingChatReq.setMeetingId(msg.getTo());
+            meetingChatReq.setContentType(msg.getContentType());
+            meetingChatReq.setContent(msg.getContent());
+            meetingChatReq.setClientMsgId(msg.getClientMsgId());
+            meetingChatReq.setCustomInfo(msg.getCustomInfo());
+            if (msg.hasFromName()) {
+                meetingChatReq.setFromUsername(msg.getFromName());
+            }
+            String userId = userChannel != null && !StringUtils.isEmpty(userChannel.getUserId())
+                    ? userChannel.getUserId() : msg.getFrom();
+            MeetingRsp<MeetingChatVO> rpcRes = meetingService.broadcastChat(userId, meetingChatReq);
+            if (rpcRes == null) {
+                throw new SignalException(IMError.UNKNOWN);
+            }
+            if (!rpcRes.ok()) {
+                logger.error("callSendMsgByMeet fail userId:[{}] convId:[{}] code:[{}] msg:[{}]",
+                        userId, msg.getTo(), rpcRes.getErrorCode(), rpcRes.getErrorMsg());
+                throw new SignalException(rpcRes.getErrorCode(), rpcRes.getErrorMsg());
+            }
+            MeetingChatVO vo = rpcRes.getData();
+            String messageId = vo != null && !StringUtils.isEmpty(vo.getMessageId())
+                    ? vo.getMessageId() : msg.getClientMsgId();
+            return SignalProto.SendMsgRes.newBuilder()
+                    .setConversation(SignalProto.ConversationType.MEETING)
+                    .setMessageId(messageId == null ? "" : messageId)
+                    .build();
+        } catch (SignalException e) {
+            throw e;
+        } catch (Exception e1) {
+            logger.error("callSendMsgByMeet error userId:[{}] convId:[{}]", msg.getFrom(), msg.getTo(), e1);
             throw new SignalException(IMError.UNKNOWN);
         }
     }

@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.imsignal;
 
 import com.alanpoi.im.lcs.transtools.LcsRegistry;
-import com.qzd.im.common.model.PersonId;
+import com.alanpoi.im.common.model.PersonId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

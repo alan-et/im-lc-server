@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.util;
 
 import com.google.protobuf.MessageLite;
-import com.qzd.im.common.response.CommonError;
+import com.alanpoi.im.common.response.CommonError;
 import com.alanpoi.im.lcs.IMError;
 import com.alanpoi.im.lcs.imsignal.SignalProto;
 import com.alanpoi.im.lcs.imsignal.UserChannel;

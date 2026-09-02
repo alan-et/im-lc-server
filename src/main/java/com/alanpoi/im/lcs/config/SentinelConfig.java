@@ -7,8 +7,8 @@
 //import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 //import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRuleManager;
 //import com.alibaba.fastjson.JSON;
-//import com.qzd.im.common.sentinel.DefaultBlockExceptionHandler;
-//import com.qzd.im.common.sentinel.ZkPathUtil;
+//import com.alanpoi.im.common.sentinel.DefaultBlockExceptionHandler;
+//import com.alanpoi.im.common.sentinel.ZkPathUtil;
 //import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;

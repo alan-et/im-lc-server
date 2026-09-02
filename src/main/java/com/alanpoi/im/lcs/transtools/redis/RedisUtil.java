@@ -25,9 +25,30 @@ public class RedisUtil {
         }
     }
 
+    /**
+     * 批量删除。
+     *
+     * <p>不能用 {@code jedis.del(keys)} —— ElastiCache Serverless 是集群模式,
+     * 多 key 命令要求所有 key 落在同一个 slot,否则直接报 CROSSSLOT。
+     * 改成 pipeline 逐个 DEL:命令仍然只走一个 RTT,但每条都是单 key,不受 slot 约束。</p>
+     */
     public Long del(String... keys) {
+        if (keys == null || keys.length == 0) {
+            return 0L;
+        }
         try (Jedis jedis = jedisPool.getResource()) {
-            return jedis.del(keys);
+            Pipeline pipelined = jedis.pipelined();
+            for (String key : keys) {
+                pipelined.del(key);
+            }
+            List<Object> list = pipelined.syncAndReturnAll();
+            long total = 0L;
+            for (Object o : list) {
+                if (o instanceof Long) {
+                    total += (Long) o;
+                }
+            }
+            return total;
         }
     }
 
@@ -54,9 +75,29 @@ public class RedisUtil {
         }
     }
 
+    /**
+     * 批量取值。<b>返回顺序与入参一一对应</b>,不存在的 key 位置为 null ——
+     * 调用方(RedisLcsFinder / UserActiveManager)是按下标去对 personIds 的,顺序不能乱。
+     *
+     * <p>同 {@link #del(String...)},这里不能用 {@code jedis.mget(keys)}:
+     * 集群模式下这些 key 按 userId 散在不同 slot,MGET 会报 CROSSSLOT。
+     * pipeline 逐个 GET 既绕开了 slot 限制,又保持一个 RTT,不会退化成 N 次往返。</p>
+     */
     public List<String> mget(String... keys) {
+        if (keys == null || keys.length == 0) {
+            return Collections.emptyList();
+        }
         try (Jedis jedis = jedisPool.getResource()) {
-            return jedis.mget(keys);
+            Pipeline pipelined = jedis.pipelined();
+            for (String key : keys) {
+                pipelined.get(key);
+            }
+            List<Object> list = pipelined.syncAndReturnAll();
+            List<String> res = new ArrayList<>(list.size());
+            for (Object o : list) {
+                res.add(o == null ? null : (String) o);
+            }
+            return res;
         }
     }
 

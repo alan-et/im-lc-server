@@ -1,7 +1,7 @@
 package com.alanpoi.im.lcs.config;
 
-import com.qzd.im.common.id.ID;
-import com.qzd.im.common.id.ServerID;
+import com.alanpoi.im.common.id.ID;
+import com.alanpoi.im.common.id.ServerID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

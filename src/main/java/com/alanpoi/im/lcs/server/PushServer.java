@@ -1,6 +1,6 @@
 package com.alanpoi.im.lcs.server;
 
-import com.qzd.im.common.util.NetworkUtil;
+import com.alanpoi.im.common.util.NetworkUtil;
 import com.alanpoi.im.lcs.imsignal.TransHandler;
 import com.alanpoi.im.lcs.metrics.Counters;
 import com.alanpoi.im.lcs.transtools.LcsRegistry;

@@ -48,6 +48,10 @@ public class RedisConfig {
     @Value("${spring.redis.database:0}")
     public int database;
 
+    /** 是否启用 TLS。ElastiCache Serverless 必须为 true,自建 Redis 一般 false */
+    @Value("${spring.redis.ssl:false}")
+    public boolean ssl;
+
     /**
      * Redis服务名称
      */
@@ -213,14 +217,20 @@ public class RedisConfig {
             standalone.setPassword(RedisPassword.of(password));
         }
 
-        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder()
-                .usePooling().poolConfig(jedisPoolConfig()).and()
-                .connectTimeout(Duration.ofMillis(this.getTimeout()))
-                .readTimeout(Duration.ofMillis(this.getTimeout()))
-                .build();
+        JedisClientConfiguration.JedisClientConfigurationBuilder clientConfigBuilder =
+                JedisClientConfiguration.builder()
+                        .usePooling().poolConfig(jedisPoolConfig()).and()
+                        .connectTimeout(Duration.ofMillis(this.getTimeout()))
+                        .readTimeout(Duration.ofMillis(this.getTimeout()));
+        // ElastiCache Serverless 强制 TLS;自建 Redis 一般没开,所以做成开关
+        if (this.ssl) {
+            clientConfigBuilder = clientConfigBuilder.useSsl().and();
+        }
+        JedisClientConfiguration clientConfig = clientConfigBuilder.build();
 
-        logger.info("jedisConnectionFactory host:[{}] port:[{}] database:[{}] password:[{}] timeout:[{}]",
-                this.getHost(), this.getPort(), this.getDatabase(),
+        // ssl 必须打出来,理由同 im-sigtranspond:TLS 开关是连不上 Serverless 的第一嫌疑
+        logger.info("jedisConnectionFactory host:[{}] port:[{}] database:[{}] ssl:[{}] password:[{}] timeout:[{}]",
+                this.getHost(), this.getPort(), this.getDatabase(), this.ssl,
                 StringUtils.isNotEmpty(password) ? "set" : "none", this.getTimeout());
         return new JedisConnectionFactory(standalone, clientConfig);
     }

@@ -40,6 +40,10 @@ public class LcsRegistryConfig {
     @Value("${spring.redis.database:0}")
     private int database;
 
+    /** 是否启用 TLS。ElastiCache Serverless 必须为 true,自建 Redis 一般 false */
+    @Value("${spring.redis.ssl:false}")
+    private boolean ssl;
+
 
     @Bean("RedisLcsRegistryPool")
     public JedisPool receiverJedisPool() {
@@ -49,15 +53,18 @@ public class LcsRegistryConfig {
         config.setMaxWaitMillis(maxWait);
         config.setMaxIdle(maxIdle);
         config.setMinIdle(minIdle);
-        logger.info("receiverJedisPool config host:[{}] port:[{}] database:[{}] password:[{}] timeout:[{}] maxActive:[{}] maxWait:[{}] maxIdle:[{}] minIdle:[{}]",
-                host, port, database, StringUtils.isBlank(password) ? "none" : "set",
+        logger.info("receiverJedisPool config host:[{}] port:[{}] database:[{}] ssl:[{}] password:[{}] timeout:[{}] maxActive:[{}] maxWait:[{}] maxIdle:[{}] minIdle:[{}]",
+                host, port, database, ssl, StringUtils.isBlank(password) ? "none" : "set",
                 timeout, maxActive, maxWait, maxIdle, minIdle);
 
+        // ssl:ElastiCache Serverless 强制加密传输,不开 TLS 连接直接建不起来。
+        // 自建 Redis 通常没开,所以做成配置项而不是写死。
         JedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
                 .connectionTimeoutMillis(timeout)
                 .socketTimeoutMillis(timeout)
                 .database(database)
                 .password(StringUtils.isBlank(password) ? null : password)
+                .ssl(ssl)
                 .build();
         return new JedisPool(config, new HostAndPort(host, port), clientConfig);
 

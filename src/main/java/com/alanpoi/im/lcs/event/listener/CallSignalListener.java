@@ -11,7 +11,7 @@ import com.alanpoi.im.sigTranspond.services.req.CallSignalReq;
 import com.alanpoi.im.sigTranspond.services.rsp.Response;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.qzd.im.common.event2.annotation.EventMapping;
+import com.alanpoi.im.common.event2.annotation.EventMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;

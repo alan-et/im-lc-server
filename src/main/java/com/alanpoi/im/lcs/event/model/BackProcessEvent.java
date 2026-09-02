@@ -1,6 +1,6 @@
 package com.alanpoi.im.lcs.event.model;
 
-import com.qzd.im.common.event2.Postable;
+import com.alanpoi.im.common.event2.Postable;
 
 public class BackProcessEvent implements Postable {
     private String userId;

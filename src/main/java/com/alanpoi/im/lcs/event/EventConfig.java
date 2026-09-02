@@ -1,8 +1,8 @@
 package com.alanpoi.im.lcs.event;
 
-import com.qzd.im.common.event2.DefaultExecutorManager;
-import com.qzd.im.common.event2.EventProducer;
-import com.qzd.im.common.event2.EventSpringSupport;
+import com.alanpoi.im.common.event2.DefaultExecutorManager;
+import com.alanpoi.im.common.event2.EventProducer;
+import com.alanpoi.im.common.event2.EventSpringSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

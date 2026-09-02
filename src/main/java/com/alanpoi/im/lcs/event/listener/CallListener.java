@@ -7,7 +7,7 @@ import com.alanpoi.im.lcs.imsignal.SignalProto;
 import com.alanpoi.im.lcs.imsignal.UserChannel;
 import com.alanpoi.im.lcs.util.ResponseUtil;
 import com.alanpoi.im.message.service.MessageService;
-import com.qzd.im.common.event2.annotation.EventMapping;
+import com.alanpoi.im.common.event2.annotation.EventMapping;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

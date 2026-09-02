@@ -1,8 +1,8 @@
 package com.alanpoi.im.lcs.transtools.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.qzd.im.common.constants.TimeConstants;
-import com.qzd.im.common.model.PersonId;
+import com.alanpoi.im.common.constants.TimeConstants;
+import com.alanpoi.im.common.model.PersonId;
 import com.alanpoi.im.lcs.transtools.AbstractLcsRegistry;
 import com.alanpoi.im.lcs.transtools.LcsInfo;
 import com.alanpoi.im.lcs.transtools.UserActiveManager;
