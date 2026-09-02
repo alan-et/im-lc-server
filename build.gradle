@@ -71,9 +71,10 @@ dependencies {
     implementation("org.aspectj:aspectjweaver:1.9.7")
 
     // 业务依赖
-    implementation group: 'com.alanpoi.im', name: 'im-common-lib', version: '1.0.0-SNAPSHOT'
-    implementation group: 'com.alanpoi.im', name: 'im-message-servie', version: '0.0.2-SNAPSHOT'
-    implementation group: 'com.alanpoi.im', name: 'im-sigTranspond-servie', version: '0.0.1-SNAPSHOT'
+    implementation group: 'com.alanpoi.im', name: 'im-common-lib', version: '1.1.0'
+    implementation group: 'com.alanpoi.im', name: 'im-message-servie', version: '0.0.3-SNAPSHOT'
+    implementation group: 'com.alanpoi.im', name: 'im-sigTranspond-servie', version: '0.0.3-SNAPSHOT'
+    implementation group: 'com.alanpoi.im', name: 'im-meeting-serve', version: '0.0.4-SNAPSHOT'
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation 'junit:junit:4.13.2'
@@ -119,7 +120,7 @@ publishing {
         trans_tools(MavenPublication) {
             groupId = 'com.alanpoi.im'
             artifactId = 'im-trans-tools'
-            version = '0.0.1-SNAPSHOT'
+            version = '0.0.3-SNAPSHOT'
 
             //from components.java
 
