@@ -23,7 +23,7 @@ version '0.0.1-SNAPSHOT'
 repositories {
     mavenLocal()
     maven {
-        url "http://43.199.160.152:8081/repository/maven-public/"
+        url "http://8.217.179.132:8081/repository/maven-public/"
         allowInsecureProtocol = true
     }
     maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
@@ -108,7 +108,7 @@ task jarTools(type: Jar, dependsOn: compileTool) {
 publishing {
     repositories {
         maven {
-            url "http://43.199.160.152:8081/repository/maven-snapshots/"
+            url "http://8.217.179.132:8081/repository/maven-snapshots/"
             allowInsecureProtocol = true
             credentials {
                 username 'admin'
